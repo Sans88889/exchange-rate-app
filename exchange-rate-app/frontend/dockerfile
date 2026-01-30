@@ -1,19 +1,23 @@
-# Krok 1: Budowanie aplikacji Angular
+# Etap 1: Budowanie i Testowanie
 FROM node:20 AS build
 WORKDIR /app
 
+# Instalacja zależności systemowych dla przeglądarki Chrome (wymagane do testów)
+RUN apt-get update && apt-get install -y chromium
+
 COPY package*.json ./
 RUN npm install
-
 COPY . .
-# Dodajemy flagę --prerender false, aby uniknąć błędu NG0401
-RUN npm run build -- --configuration production --prerender false
 
-# Krok 2: Serwowanie aplikacji za pomocą serwera Nginx
+# Uruchomienie testów przed budowaniem wersji produkcyjnej
+# Jeśli testy zawiodą, cały proces budowania zostanie przerwany
+RUN npx ng test --watch=false --browsers=ChromeHeadless
+
+# Budowanie wersji produkcyjnej
+RUN npm run build -- --configuration production
+
+# Etap 2: Serwowanie (Nginx)
 FROM nginx:stable-alpine
-# UWAGA: Sprawdź dokładnie ścieżkę w folderze dist po nieudanym buildzie
-# Zazwyczaj jest to /app/dist/frontend/browser
 COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
-
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
