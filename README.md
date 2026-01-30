@@ -1,59 +1,23 @@
-# Frontend
+# Currency Exchange Rate Monitor (NBP API)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
+Aplikacja webowa typu Fullstack umożliwiająca pobieranie, archiwizowanie oraz filtrowanie kursów walut z Narodowego Banku Polskiego. Projekt realizowany w ramach przedmiotu Programowanie Zaawansowane II.
 
-## Development server
+## 🚀 Technologie
+* [cite_start]**Frontend:** Angular 17/18 (Standalone Components, Signals) [cite: 11]
+* [cite_start]**Backend:** FastAPI (Python 3.11) [cite: 12]
+* [cite_start]**Baza Danych:** PostgreSQL 15 [cite: 13]
+* [cite_start]**Konteneryzacja:** Docker & Docker Compose [cite: 14]
+* [cite_start]**Testy:** Pytest (Backend), Jasmine/Vitest (Frontend) [cite: 16, 17, 18]
 
-To start a local development server, run:
+## ✨ Funkcjonalności
+* [cite_start]**Pobieranie danych historycznych:** Automatyczne zaciąganie danych z ostatnich 12 miesięcy z API NBP[cite: 8, 32].
+* [cite_start]**Zaawansowane filtrowanie:** Dynamiczna filtracja wyników według waluty, roku, kwartału oraz miesiąca[cite: 50, 54].
+* [cite_start]**Automatyczne testy:** Integracja testów jednostkowych z procesem budowania obrazów Docker (CI/CD)[cite: 9, 51].
 
-```bash
-ng serve
-```
+## 🛠️ Instrukcja uruchomienia
+Wymagany zainstalowany **Docker Desktop**.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. Sklonuj repozytorium:
+   ```bash
+   git clone <link-do-twojego-repozytorium>
+   cd exchange-rate-app
