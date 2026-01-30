@@ -1,22 +1,50 @@
 <div style="padding: 20px; font-family: sans-serif;">
   <h1>Monitor Kursów Walut NBP</h1>
   
-  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-    <button (click)="fetchNewData()" style="padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-      Aktualizuj dane z NBP
-    </button>
-    
-    <input type="text" 
-           [(ngModel)]="searchTerm" 
-           (input)="filterResults()" 
-           placeholder="Szukaj waluty lub kodu..." 
-           style="padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+  <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+      
+      <button (click)="fetchNewData()" style="padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Aktualizuj bazę (ostatni rok)
+      </button>
+
+      <input type="text" [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="Szukaj waluty/kodu..." style="padding: 8px; width: 200px;">
+
+      <div>
+        Rok:
+        <select [(ngModel)]="selectedYear" (change)="applyFilters()">
+          <option value="Wszystkie">Wszystkie</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+        </select>
+      </div>
+
+      <div>
+        Kwartał:
+        <select [(ngModel)]="selectedQuarter" (change)="applyFilters()">
+          <option value="Wszystkie">Wszystkie</option>
+          <option value="1">I Kwartał</option>
+          <option value="2">II Kwartał</option>
+          <option value="3">III Kwartał</option>
+          <option value="4">IV Kwartał</option>
+        </select>
+      </div>
+
+      <div>
+        Miesiąc:
+        <select [(ngModel)]="selectedMonth" (change)="applyFilters()">
+          <option value="Wszystkie">Wszystkie</option>
+          <option value="1">Styczeń</option>
+          <option value="2">Luty</option>
+          </select>
+      </div>
+
+    </div>
+    <p style="margin-top: 10px;"><strong>Status:</strong> {{ status }}</p>
   </div>
-  
-  <p><strong>Status:</strong> {{ status }}</p>
 
   <table border="1" style="width: 100%; border-collapse: collapse;">
-    <thead style="background: #f0f0f0;">
+    <thead style="background: #e9ecef;">
       <tr>
         <th style="padding: 10px;">Waluta</th>
         <th style="padding: 10px;">Kod</th>
@@ -25,7 +53,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let rate of filteredCurrencies"> <td style="padding: 10px;">{{ rate.currency }}</td>
+      <tr *ngFor="let rate of filteredCurrencies">
+        <td style="padding: 10px;">{{ rate.currency }}</td>
         <td style="padding: 10px;">{{ rate.code }}</td>
         <td style="padding: 10px;">{{ rate.mid }}</td>
         <td style="padding: 10px;">{{ rate.date }}</td>

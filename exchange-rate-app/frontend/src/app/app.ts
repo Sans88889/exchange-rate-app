@@ -1,20 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms'; // Dodajemy FormsModule
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Dodaj FormsModule tutaj
+  imports: [CommonModule, FormsModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class AppComponent implements OnInit {
   currencies: any[] = [];
-  filteredCurrencies: any[] = []; // Tablica na odfiltrowane dane
+  filteredCurrencies: any[] = [];
   status: string = '';
-  searchTerm: string = ''; // Tu trafi tekst z wyszukiwarki
+  searchTerm: string = '';
+  
+  // Opcje filtrów czasowych
+  selectedYear: string = 'Wszystkie';
+  selectedQuarter: string = 'Wszystkie';
+  selectedMonth: string = 'Wszystkie';
 
   constructor(private http: HttpClient) {}
 
@@ -26,31 +31,41 @@ export class AppComponent implements OnInit {
     this.http.get<any[]>('http://localhost:8000/currencies').subscribe({
       next: (data) => {
         this.currencies = data;
-        this.filterResults(); // Odśwież filtrowanie po pobraniu
+        this.applyFilters();
       },
-      error: () => { this.status = 'Błąd połączenia.'; }
+      error: () => { this.status = 'Błąd połączenia z backendem.'; }
     });
   }
 
-  filterResults(): void {
-    if (!this.searchTerm) {
-      this.filteredCurrencies = this.currencies;
-    } else {
-      this.filteredCurrencies = this.currencies.filter(c =>
-        c.currency.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        c.code.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
+  // Główna funkcja filtrująca spełniająca wymagania projektowe
+  applyFilters(): void {
+    this.filteredCurrencies = this.currencies.filter(rate => {
+      const rateDate = new Date(rate.date);
+      const year = rateDate.getFullYear().toString();
+      const month = (rateDate.getMonth() + 1); // Miesiące są 0-11
+      const quarter = Math.ceil(month / 3).toString();
+
+      // Filtracja tekstowa (nazwa/kod)
+      const matchesSearch = rate.currency.toLowerCase().includes(this.searchTerm.toLowerCase()) || 
+                            rate.code.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      // Filtracja czasowa
+      const matchesYear = this.selectedYear === 'Wszystkie' || year === this.selectedYear;
+      const matchesQuarter = this.selectedQuarter === 'Wszystkie' || quarter === this.selectedQuarter;
+      const matchesMonth = this.selectedMonth === 'Wszystkie' || month.toString() === this.selectedMonth;
+
+      return matchesSearch && matchesYear && matchesQuarter && matchesMonth;
+    });
   }
 
   fetchNewData(): void {
-    this.status = 'Pobieranie...';
+    this.status = 'Pobieranie danych z ostatniego roku (może to potrwać)...';
     this.http.post('http://localhost:8000/currencies/fetch', {}).subscribe({
       next: () => {
-        this.status = 'Zaktualizowano dane!';
+        this.status = 'Zaktualizowano bazę o dane historyczne!';
         this.getRates();
       },
-      error: () => { this.status = 'Błąd pobierania.'; }
+      error: () => { this.status = 'Błąd pobierania danych z API NBP.'; }
     });
   }
 }

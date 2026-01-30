@@ -1,12 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from sqlalchemy.orm import sessionmaker, Session
+from datetime import datetime, timedelta
 
-# 1. Poprawny URL do bazy danych (poprawione ukośniki)
+# 1. Konfiguracja bazy danych
 DATABASE_URL = "postgresql://user:password@db:5432/currency_db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -26,7 +26,15 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# 3. Pełna konfiguracja CORS (bardzo ważne dla Angulara!)
+# Funkcja pomocnicza do sesji bazy danych (Dependency Injection)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# 3. Konfiguracja CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -40,33 +48,44 @@ def read_root():
     return {"status": "Backend działa!"}
 
 @app.get("/currencies")
-def get_currencies():
-    db = SessionLocal()
-    try:
-        rates = db.query(CurrencyRate).all() # Pobieranie z bazy
-        return rates
-    finally:
-        db.close()
+def get_currencies(db: Session = Depends(get_db)):
+    rates = db.query(CurrencyRate).all()
+    return rates
 
 @app.post("/currencies/fetch")
-def fetch_nbp_data():
-    url = "https://api.nbp.pl/api/exchangerates/tables/A?format=json"
-    response = requests.get(url) # Pobieranie z NBP
-    data = response.json()[0]
-    date_obj = datetime.strptime(data['effectiveDate'], '%Y-%m-%d').date()
+def fetch_currencies(db: Session = Depends(get_db)):
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=365)
     
-    db = SessionLocal()
-    try:
-        db.query(CurrencyRate).delete() # Czyścimy stare dane
-        for rate in data['rates']:
-            new_rate = CurrencyRate(
-                currency=rate['currency'],
-                code=rate['code'],
-                mid=rate['mid'],
-                date=date_obj
-            )
-            db.add(new_rate)
-        db.commit()
-        return {"status": "Success"}
-    finally:
-        db.close()
+    current_start = start_date
+    while current_start < end_date:
+        # NBP pozwala na max 93 dni w jednym zapytaniu
+        current_end = min(current_start + timedelta(days=90), end_date)
+        
+        url = f"https://api.nbp.pl/api/exchangerates/tables/A/{current_start}/{current_end}/?format=json"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            data = response.json()
+            for table in data:
+                date_val = table['effectiveDate']
+                for rate in table['rates']:
+                    # Weryfikacja unikalności, aby nie dublować danych
+                    existing = db.query(CurrencyRate).filter(
+                        CurrencyRate.code == rate['code'], 
+                        CurrencyRate.date == date_val
+                    ).first()
+                    
+                    if not existing:
+                        new_rate = CurrencyRate(
+                            currency=rate['currency'],
+                            code=rate['code'],
+                            mid=rate['mid'],
+                            date=date_val
+                        )
+                        db.add(new_rate)
+            db.commit()
+        
+        current_start = current_end + timedelta(days=1)
+        
+    return {"status": "Dane z ostatniego roku pobrane pomyślnie"}
