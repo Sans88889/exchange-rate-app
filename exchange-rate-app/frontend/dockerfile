@@ -1,22 +1,17 @@
 # Etap 1: Budowanie i Testowanie
 FROM node:20 AS build
 WORKDIR /app
-
-# Instalacja zależności systemowych dla przeglądarki Chrome (wymagane do testów)
-RUN apt-get update && apt-get install -y chromium
-
 COPY package*.json ./
 RUN npm install
 COPY . .
 
-# Uruchomienie testów przed budowaniem wersji produkcyjnej
-# Jeśli testy zawiodą, cały proces budowania zostanie przerwany
-RUN npx ng test --watch=false --browsers=ChromeHeadless
+# Testy w trybie "headless" bez szukania Windowsowych ścieżek
+RUN npx ng test --watch=false --browsers=chrome --no-sandbox
 
 # Budowanie wersji produkcyjnej
 RUN npm run build -- --configuration production
 
-# Etap 2: Serwowanie (Nginx)
+# Etap 2: Serwowanie
 FROM nginx:stable-alpine
 COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 EXPOSE 80
