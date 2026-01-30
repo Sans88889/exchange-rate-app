@@ -37,7 +37,8 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // Główna funkcja filtrująca spełniająca wymagania projektowe
+// Funkcja filtrująca dane w czasie rzeczywistym po stronie klienta
+// Obsługuje jednoczesne wyszukiwanie po nazwie oraz filtrację po roku, kwartale i miesiącu.
   applyFilters(): void {
     this.filteredCurrencies = this.currencies.filter(rate => {
       const rateDate = new Date(rate.date);

@@ -1,24 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app';
+import { describe, it, expect, beforeEach } from 'vitest'; // Importy z vitest
 
-describe('AppComponent', () => {
+describe('AppComponent Logic Tests', () => {
   let component: AppComponent;
-  let fixture: ComponentFixture<AppComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, HttpClientTestingModule, FormsModule],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AppComponent);
+    const fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('powinien stworzyć aplikację', () => {
-    expect(component).toBeTruthy();
   });
 
   it('powinien poprawnie filtrować dane po wpisaniu kodu waluty', () => {

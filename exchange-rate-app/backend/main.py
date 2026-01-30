@@ -12,7 +12,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# 2. Model bazy danych
+# Model danych kursu walutowego mapujący tabelę PostgreSQL
 class CurrencyRate(Base):
     __tablename__ = "currency_rates"
     id = Column(Integer, primary_key=True, index=True)
@@ -59,18 +59,15 @@ def fetch_currencies(db: Session = Depends(get_db)):
     
     current_start = start_date
     while current_start < end_date:
-        # NBP pozwala na max 93 dni w jednym zapytaniu
         current_end = min(current_start + timedelta(days=90), end_date)
-        
         url = f"https://api.nbp.pl/api/exchangerates/tables/A/{current_start}/{current_end}/?format=json"
-        response = requests.get(url)
         
+        response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
             for table in data:
                 date_val = table['effectiveDate']
                 for rate in table['rates']:
-                    # Weryfikacja unikalności, aby nie dublować danych
                     existing = db.query(CurrencyRate).filter(
                         CurrencyRate.code == rate['code'], 
                         CurrencyRate.date == date_val
@@ -84,7 +81,7 @@ def fetch_currencies(db: Session = Depends(get_db)):
                             date=date_val
                         )
                         db.add(new_rate)
-            db.commit()
+            db.commit() # Zatwierdzamy każdą paczkę 90 dni
         
         current_start = current_end + timedelta(days=1)
         

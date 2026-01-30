@@ -6,7 +6,7 @@ RUN npm install
 COPY . .
 
 # Testy w trybie "headless" bez szukania Windowsowych ścieżek
-RUN npx ng test --watch=false --browsers=chrome --no-sandbox
+RUN npx ng test --watch=false
 
 # Budowanie wersji produkcyjnej
 RUN npm run build -- --configuration production
