@@ -1,28 +1,29 @@
-<div style="padding: 20px; font-family: Arial;">
+<div style="padding: 20px; font-family: sans-serif;">
   <h1>Monitor Kursów Walut NBP</h1>
   
-  <button (click)="fetchNewData()" style="padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-    Pobierz najnowsze kursy z NBP
+  <button (click)="fetchNewData()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Aktualizuj dane z NBP
   </button>
-  <p>{{ status }}</p>
+  
+  <p><strong>Status:</strong> {{ status }}</p>
 
   <hr>
 
-  <table border="1" style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 20px;">
-    <thead style="background: #f4f4f4;">
+  <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead style="background: #f0f0f0;">
       <tr>
-        <th>Waluta</th>
-        <th>Kod</th>
-        <th>Kurs (MID)</th>
-        <th>Data</th>
+        <th style="padding: 10px;">Waluta</th>
+        <th style="padding: 10px;">Kod</th>
+        <th style="padding: 10px;">Kurs (MID)</th>
+        <th style="padding: 10px;">Data</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let rate of currencies">
-        <td>{{ rate.currency }}</td>
-        <td>{{ rate.code }}</td>
-        <td>{{ rate.mid }}</td>
-        <td>{{ rate.date }}</td>
+        <td style="padding: 10px;">{{ rate.currency }}</td>
+        <td style="padding: 10px;">{{ rate.code }}</td>
+        <td style="padding: 10px;">{{ rate.mid }}</td>
+        <td style="padding: 10px;">{{ rate.date }}</td>
       </tr>
     </tbody>
   </table>

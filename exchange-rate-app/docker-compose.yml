@@ -23,4 +23,6 @@ services:
     build: ./frontend
     container_name: exchange_rate_frontend
     ports:
-      - "4200:4200"
+      - "4200:80" # Mapujemy port 80 Nginxa na Twoje 4200
+    depends_on:
+      - backend
