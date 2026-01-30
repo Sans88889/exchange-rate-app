@@ -10,3 +10,17 @@ services:
       POSTGRES_DB: currency_db
     ports:
       - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: exchange_rate_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: exchange_rate_frontend
+    ports:
+      - "4200:4200"

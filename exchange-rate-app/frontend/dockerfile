@@ -1,0 +1,20 @@
+# Krok 1: Budowanie aplikacji Angular
+FROM node:20 AS build
+WORKDIR /app
+
+# Kopiujemy pliki konfiguracyjne
+COPY package*.json ./
+RUN npm install
+
+# Kopiujemy resztę kodu źródłowego i budujemy projekt
+COPY . .
+RUN npm run build -- --configuration production
+
+# Krok 2: Serwowanie aplikacji za pomocą serwera Nginx
+FROM nginx:stable-alpine
+# Kopiujemy zbudowaną aplikację do folderu Nginxa
+COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
+
+# Udostępniamy port 80 (wewnątrz kontenera)
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
