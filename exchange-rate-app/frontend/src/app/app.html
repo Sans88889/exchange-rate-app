@@ -1,15 +1,21 @@
 <div style="padding: 20px; font-family: sans-serif;">
   <h1>Monitor Kursów Walut NBP</h1>
   
-  <button (click)="fetchNewData()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-    Aktualizuj dane z NBP
-  </button>
+  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <button (click)="fetchNewData()" style="padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Aktualizuj dane z NBP
+    </button>
+    
+    <input type="text" 
+           [(ngModel)]="searchTerm" 
+           (input)="filterResults()" 
+           placeholder="Szukaj waluty lub kodu..." 
+           style="padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
   
   <p><strong>Status:</strong> {{ status }}</p>
 
-  <hr>
-
-  <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+  <table border="1" style="width: 100%; border-collapse: collapse;">
     <thead style="background: #f0f0f0;">
       <tr>
         <th style="padding: 10px;">Waluta</th>
@@ -19,8 +25,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let rate of currencies">
-        <td style="padding: 10px;">{{ rate.currency }}</td>
+      <tr *ngFor="let rate of filteredCurrencies"> <td style="padding: 10px;">{{ rate.currency }}</td>
         <td style="padding: 10px;">{{ rate.code }}</td>
         <td style="padding: 10px;">{{ rate.mid }}</td>
         <td style="padding: 10px;">{{ rate.date }}</td>
